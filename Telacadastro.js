@@ -10,9 +10,7 @@ import {
   StyleSheet
 } from 'react-native';
 import { User, Mail, Lock, ArrowRight } from 'lucide-react-native';
-
 import { db } from './FirebaseConfig';
-
 
 export default function Telacadastro({navigation}) {
   const [name, setName] = useState('');
@@ -21,40 +19,49 @@ export default function Telacadastro({navigation}) {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-const enviarMensagem = async () => {
-  if (!name.trim() || !email.trim() || !password.trim()) {
-    alert("Preencha todos os campos corretamente.");
-    return;
-  }
+  const validarEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
 
-  setLoading(true);
+  const enviarMensagem = async () => {
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      Alert.alert("Atenção", "Preencha todos os campos.");
+      return;
+    }
 
-  try {
-    await db.collection('Cadastro').add({
-      nome: name,
-      email: email.toLowerCase(),
-      senha: password,
-      data: new Date().toISOString()
-    });
+    if (!validarEmail(email)) {
+      Alert.alert("E-mail inválido", "Digite um e-mail no formato correto. Ex: nome@email.com");
+      return;
+    }
 
-    // 🔥 ALERTA COM AÇÃO DE NAVEGAÇÃO
-    alert("Sucesso", "Cadastrado com sucesso!");
+    setLoading(true);
 
-    setTimeout(() => {
-      navigation.navigate("Login", { nome: name });
-    }, 100);
+    try {
+      await db.collection('Cadastro').add({
+        nome: name,
+        email: email.toLowerCase(),
+        senha: password,
+        data: new Date().toISOString()
+      });
 
-    setName('');
-    setEmail('');
-    setPassword('');
+      Alert.alert("Sucesso", "Cadastrado com sucesso!");
 
-  } catch (error) {
-    console.error(error);
-    Alert.alert("Erro", "Erro ao salvar: " + error.message);
-  } finally {
-    setLoading(false);
-  }
-};
+      setTimeout(() => {
+        navigation.navigate("Login", { nome: name });
+      }, 100);
+
+      setName('');
+      setEmail('');
+      setPassword('');
+
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erro", "Erro ao salvar: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -94,7 +101,6 @@ const enviarMensagem = async () => {
 
           <View style={styles.inputContainer}>
             <Lock color="#0056b3" size={20} style={styles.icon} />
-
             <TextInput
               style={styles.input}
               placeholder="Senha"
@@ -103,7 +109,6 @@ const enviarMensagem = async () => {
               value={password}
               onChangeText={setPassword}
             />
-
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               <Text style={styles.showText}>
                 {showPassword ? "Ocultar" : "Exibir"}
@@ -129,13 +134,14 @@ const enviarMensagem = async () => {
           onPress={() => navigation.navigate('Login')}
         >
           <Text style={styles.footerText}>
-             Já tem uma conta? <Text style={styles.link}>Entrar</Text>
+            Já tem uma conta? <Text style={styles.link}>Entrar</Text>
           </Text>
         </TouchableOpacity>
       </KeyboardAvoidingView>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -189,7 +195,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
-    
     elevation: 4,
     shadowColor: '#0056b3',
     shadowOffset: { width: 0, height: 4 },

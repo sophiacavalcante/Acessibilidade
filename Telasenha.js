@@ -4,9 +4,19 @@ import { Text, View, StyleSheet, TextInput, TouchableOpacity, Alert } from 'reac
 export default function RecuperarSenha() {
   const [email, setEmail] = useState('');
 
+  const validarEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
   const handleRecuperarSenha = () => {
     if (email === '') {
-      Alert.alert("Acessibilidade", "Campo vazio. Por favor, digite seu e-mail para continuar.");
+      Alert.alert("Atenção", "Campo vazio. Digite seu e-mail para continuar.");
+      return;
+    }
+
+    if (!validarEmail(email)) {
+      Alert.alert("E-mail inválido", "Digite um e-mail no formato correto. Ex: nome@email.com");
       return;
     }
 
@@ -29,7 +39,6 @@ export default function RecuperarSenha() {
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
-          // Atributos de Acessibilidade
           accessibilityLabel="Campo de entrada de e-mail"
           accessibilityHint="Digite aqui o e-mail que você usou no cadastro"
         />

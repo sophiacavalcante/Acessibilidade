@@ -1,11 +1,56 @@
-# Sample Snack app
+# Acessi+
 
-Open the `App.js` file to start writing some code. You can preview the changes directly on your phone or tablet by scanning the **QR code** or use the iOS or Android emulators. When you're done, click **Save** and share the link!
+## Description
 
-When you're ready to see everything that Expo provides (or if you want to use your own editor) you can **Download** your project and use it with [expo cli](https://docs.expo.dev/get-started/installation/#expo-cli)).
+Acessi+ is a mobile application focused on accessibility and inclusion.  
 
-All projects created in Snack are publicly available, so you can easily share the link to this project via link, or embed it on a web page with the `<>` button.
+The app helps users find accessible places and provides accessibility tools to improve the user experience for people with disabilities or reduced mobility.
 
-If you're having problems, you can tweet to us [@expo](https://twitter.com/expo) or ask in our [forums](https://forums.expo.dev/c/expo-dev-tools/61) or [Discord](https://chat.expo.dev/).
+---
 
-Snack is Open Source. You can find the code on the [GitHub repo](https://github.com/expo/snack).
+## Features
+
+- User login and registration
+- Accessibility settings
+- Font size adjustment
+- High contrast mode
+- Colorblind mode
+- Accessible places map
+- Accessible bathroom filter
+- Ramp accessibility filter
+- Text reader feature
+
+---
+
+## Technologies
+
+- React Native
+- Expo
+- JavaScript
+- Firebase
+- React Navigation
+
+---
+
+## How to Run
+
+1. Install Node.js
+2. Install Expo Go on your mobile device
+3. Clone the repository
+4. Open the project folder
+5. Run the command:
+
+```bash
+npx expo start
+```
+
+6. Scan the QR Code using Expo Go
+
+---
+
+## Authors
+
+- Levi Augusto Cavalcante de Castro
+- Matheus Santos de Alencar
+- Vinner Rodrigues de Oliveira
+- Sophia Cavalcante Ferreira de Oliveira

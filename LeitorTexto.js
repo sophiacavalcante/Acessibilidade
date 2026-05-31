@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import {
   View,
   Text,
@@ -6,188 +7,486 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
+
 import { Ionicons } from '@expo/vector-icons';
+
 import * as Speech from 'expo-speech';
+
+import { useConfig } from './Config';
 
 export default function App() {
   const [texto, setTexto] = useState('');
-  const [textoTraduzido, setTextoTraduzido] = useState('');
-  const [voices, setVoices] = useState([]);
-  const [vozSelecionada, setVozSelecionada] = useState(null);
-  const [tocando, setTocando] = useState(false);
-  const [loadingVoices, setLoadingVoices] = useState(true);
 
-  // 🔊 Carregar vozes reais
+  const [textoTraduzido, setTextoTraduzido] =
+    useState('');
+
+  const [voices, setVoices] =
+    useState([]);
+
+  const [
+    vozSelecionada,
+    setVozSelecionada,
+  ] = useState(null);
+
+  const [tocando, setTocando] =
+    useState(false);
+
+  const [
+    loadingVoices,
+    setLoadingVoices,
+  ] = useState(true);
+
+  // CONFIGURAÇÕES GLOBAIS
+
+  const {
+    fontSize,
+    altoContraste,
+    modoDaltonico,
+  } = useConfig();
+
+  // CORES PADRÃO
+
+  let bg = '#F4F4F4';
+
+  let cardBg = '#FFFFFF';
+
+  let textColor = '#111827';
+
+  let secondaryText = '#555';
+
+  let primary = '#2F5DFF';
+
+  let borderColor = '#DDD';
+
+  let inputBg = '#FFFFFF';
+
+  let activeVoice = '#DCE4FF';
+
+  // ALTO CONTRASTE
+
+  if (altoContraste) {
+    bg = '#000000';
+
+    cardBg = '#111111';
+
+    textColor = '#FFFFFF';
+
+    secondaryText = '#DDDDDD';
+
+    primary = '#0A84FF';
+
+    borderColor = '#444444';
+
+    inputBg = '#1A1A1A';
+
+    activeVoice = '#0A84FF';
+  }
+
+  // MODO DALTÔNICO
+
+  if (modoDaltonico) {
+    bg = '#FFFFFF';
+
+    cardBg = '#F2F2F2';
+
+    textColor = '#000000';
+
+    secondaryText = '#333333';
+
+    primary = '#000000';
+
+    borderColor = '#CCCCCC';
+
+    inputBg = '#FFFFFF';
+
+    activeVoice = '#D9D9D9';
+  }
+
+  // 🔊 CARREGAR VOZES
+
   useEffect(() => {
     const carregarVozes = async () => {
-      const v = await Speech.getAvailableVoicesAsync();
+      const v =
+        await Speech.getAvailableVoicesAsync();
 
-      const idiomasPermitidos = ['pt', 'en', 'es', 'fr'];
+      const idiomasPermitidos = [
+        'pt',
+        'en',
+        'es',
+        'fr',
+      ];
 
-      const validas = v.filter(voice => {
-      const lang = voice.language.split('-')[0];
+      const validas = v.filter(
+        voice => {
+          const lang =
+            voice.language.split(
+              '-'
+            )[0];
 
-      // Se for português → só deixa Google
-      if (lang === 'pt') {
-        return (
-          !voice.networkConnectionRequired &&
-          voice.name.toLowerCase().includes('google')
-        );
-      }
+          // PORTUGUÊS → APENAS GOOGLE
 
-      // Outros idiomas continuam normais
-      return (
-        !voice.networkConnectionRequired &&
-        idiomasPermitidos.includes(lang)
+          if (lang === 'pt') {
+            return (
+              !voice.networkConnectionRequired &&
+              voice.name
+                .toLowerCase()
+                .includes('google')
+            );
+          }
+
+          return (
+            !voice.networkConnectionRequired &&
+            idiomasPermitidos.includes(
+              lang
+            )
+          );
+        }
       );
-      });
 
       setVoices(validas);
+
       setVozSelecionada(validas[0]);
+
       setLoadingVoices(false);
     };
 
     carregarVozes();
   }, []);
 
-  // 🌐 Traduzir automaticamente com base na voz
+  // 🌐 TRADUÇÃO
+
   const traduzirTexto = async () => {
     if (!texto) return '';
 
     try {
-      const lang = vozSelecionada?.language?.split('-')[0] || 'pt';
+      const lang =
+        vozSelecionada?.language?.split(
+          '-'
+        )[0] || 'pt';
 
       const response = await fetch(
-        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(texto)}`
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(
+          texto
+        )}`
       );
 
-      const data = await response.json();
-      const traduzido = data[0].map(item => item[0]).join('');
+      const data =
+        await response.json();
 
-      setTextoTraduzido(traduzido);
+      const traduzido = data[0]
+        .map(item => item[0])
+        .join('');
+
+      setTextoTraduzido(
+        traduzido
+      );
+
       return traduzido;
     } catch (error) {
-      console.log('Erro na tradução:', error);
+      console.log(
+        'Erro na tradução:',
+        error
+      );
+
       return texto;
     }
   };
 
-  // ▶️ Falar texto
+  // ▶️ FALAR TEXTO
+
   const falarTexto = async () => {
     if (!texto) return;
 
     if (tocando) {
       Speech.stop();
+
       setTocando(false);
+
       return;
     }
 
     setTocando(true);
 
-    const textoFinal = await traduzirTexto();
+    const textoFinal =
+      await traduzirTexto();
 
     Speech.speak(textoFinal, {
-      voice: vozSelecionada?.identifier,
-      onDone: () => setTocando(false),
-      onStopped: () => setTocando(false),
+      voice:
+        vozSelecionada?.identifier,
+
+      onDone: () =>
+        setTocando(false),
+
+      onStopped: () =>
+        setTocando(false),
     });
   };
-  const formatarNomeVoz = (voice) => {
-  // remove "Google" ou "Microsoft"
-  let nome = voice.name
-    .replace(/Google\s?/i, '')
-    .replace(/Microsoft\s?/i, '');
 
-  // pega só o primeiro nome (Daniel, Maria, etc)
-  const primeiroNome = nome.split(' ')[0];
+  // FORMATAR NOME DAS VOZES
 
-  // idioma base
-  const langCode = voice.language.split('-')[0];
+  const formatarNomeVoz = voice => {
+    let nome = voice.name
+      .replace(/Google\s?/i, '')
+      .replace(/Microsoft\s?/i, '');
 
-  const idiomas = {
-    pt: 'portugues',
-    en: 'ingles',
-    es: 'espanhol',
-    de: 'alemao',
-    fr: 'frances'
+    const primeiroNome =
+      nome.split(' ')[0];
+
+    const langCode =
+      voice.language.split('-')[0];
+
+    const idiomas = {
+      pt: 'português',
+      en: 'inglês',
+      es: 'espanhol',
+      de: 'alemão',
+      fr: 'francês',
+    };
+
+    const idiomaLocal =
+      idiomas[langCode] ||
+      langCode;
+
+    const regiao =
+      voice.language.split('-')[1] ||
+      '';
+
+    return `${idiomaLocal} (${primeiroNome}) - ${regiao}`;
   };
 
-  const idiomaLocal = idiomas[langCode] || langCode;
-
-  // região (Brazil, US, etc)
-  const regiao = voice.language.split('-')[1] || '';
-
-  return `${idiomaLocal} (${primeiroNome}) - ${voice.language.includes('pt') ? 'portuguese' : voice.language.includes('en') ? 'english' : voice.language.includes('es') ? 'spanish' : voice.language} (${regiao})`;
-  };
   return (
-    <ScrollView style={styles.container}>
-      
-      {/* Header */}
+    <ScrollView
+      style={[
+        styles.container,
+        {
+          backgroundColor: bg,
+        },
+      ]}
+    >
+      {/* HEADER */}
+
       <View style={styles.header}>
-        <Ionicons name="volume-high" size={28} color="#2F5DFF" />
-        <Text style={styles.title}>Leitor de Texto</Text>
+        <Ionicons
+          name="volume-high"
+          size={28}
+          color={primary}
+        />
+
+        <Text
+          style={[
+            styles.title,
+            {
+              color: textColor,
+              fontSize:
+                fontSize + 8,
+            },
+          ]}
+        >
+          Leitor de Texto
+        </Text>
       </View>
 
-      {/* Input */}
-      <View style={styles.card}>
-        <Text style={styles.label}>Digite o texto</Text>
+      {/* INPUT */}
+
+      <View
+        style={[
+          styles.card,
+          {
+            backgroundColor:
+              cardBg,
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.label,
+            {
+              color: textColor,
+              fontSize:
+                fontSize,
+            },
+          ]}
+        >
+          Digite o texto
+        </Text>
 
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              borderColor:
+                borderColor,
+
+              backgroundColor:
+                inputBg,
+
+              color: textColor,
+
+              fontSize:
+                fontSize,
+            },
+          ]}
           multiline
           placeholder="Digite algo..."
+          placeholderTextColor={
+            secondaryText
+          }
           value={texto}
           onChangeText={setTexto}
         />
 
         {textoTraduzido ? (
           <>
-            <Text style={styles.label}>Texto traduzido:</Text>
-            <Text style={styles.translated}>{textoTraduzido}</Text>
+            <Text
+              style={[
+                styles.label,
+                {
+                  color:
+                    textColor,
+
+                  fontSize:
+                    fontSize,
+                },
+              ]}
+            >
+              Texto traduzido:
+            </Text>
+
+            <Text
+              style={[
+                styles.translated,
+                {
+                  color:
+                    secondaryText,
+
+                  fontSize:
+                    fontSize - 1,
+                },
+              ]}
+            >
+              {textoTraduzido}
+            </Text>
           </>
         ) : null}
       </View>
 
-      {/* Controles */}
-      <View style={styles.card}>
-        <Text style={styles.label}>Reprodução</Text>
+      {/* CONTROLES */}
 
-        <TouchableOpacity style={styles.playBtn} onPress={falarTexto}>
+      <View
+        style={[
+          styles.card,
+          {
+            backgroundColor:
+              cardBg,
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.label,
+            {
+              color: textColor,
+              fontSize:
+                fontSize,
+            },
+          ]}
+        >
+          Reprodução
+        </Text>
+
+        <TouchableOpacity
+          style={[
+            styles.playBtn,
+            {
+              backgroundColor:
+                primary,
+            },
+          ]}
+          onPress={falarTexto}
+        >
           <Ionicons
-            name={tocando ? "pause" : "play"}
+            name={
+              tocando
+                ? 'pause'
+                : 'play'
+            }
             size={28}
             color="#FFF"
           />
         </TouchableOpacity>
 
-        {/* Vozes */}
-        <Text style={styles.label}>Vozes disponíveis</Text>
+        {/* VOZES */}
+
+        <Text
+          style={[
+            styles.label,
+            {
+              color: textColor,
+              fontSize:
+                fontSize,
+            },
+          ]}
+        >
+          Vozes disponíveis
+        </Text>
 
         {loadingVoices ? (
-          <ActivityIndicator />
+          <ActivityIndicator
+            color={primary}
+          />
         ) : (
-          <ScrollView style={{ maxHeight: 200 }}>
-            {voices.map((v, i) => (
-              <TouchableOpacity
-                key={i}
-                style={[
-                  styles.voiceItem,
-                  vozSelecionada?.identifier === v.identifier &&
-                    styles.voiceActive
-                ]}
-                onPress={() => setVozSelecionada(v)}
-              >
-                <Text style={styles.voiceText}>
-                  {formatarNomeVoz(v)}
-                </Text>
-              </TouchableOpacity>
-            ))}
+          <ScrollView
+            style={{
+              maxHeight: 200,
+            }}
+          >
+            {voices.map(
+              (v, i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={[
+                    styles.voiceItem,
+                    {
+                      borderColor:
+                        borderColor,
+                    },
+
+                    vozSelecionada?.identifier ===
+                      v.identifier && {
+                      backgroundColor:
+                        activeVoice,
+                    },
+                  ]}
+                  onPress={() =>
+                    setVozSelecionada(
+                      v
+                    )
+                  }
+                >
+                  <Text
+                    style={[
+                      styles.voiceText,
+                      {
+                        color:
+                          textColor,
+
+                        fontSize:
+                          fontSize - 2,
+                      },
+                    ]}
+                  >
+                    {formatarNomeVoz(
+                      v
+                    )}
+                  </Text>
+                </TouchableOpacity>
+              )
+            )}
           </ScrollView>
         )}
       </View>
-
     </ScrollView>
   );
 }
@@ -195,7 +494,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F4F4',
     padding: 16,
   },
 
@@ -204,18 +502,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     marginBottom: 10,
+    marginTop: 10,
   },
 
   title: {
-    fontSize: 22,
     fontWeight: 'bold',
   },
 
   card: {
-    backgroundColor: '#FFF',
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
     marginBottom: 16,
+
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
   },
 
   label: {
@@ -225,7 +527,6 @@ const styles = StyleSheet.create({
 
   input: {
     borderWidth: 1,
-    borderColor: '#DDD',
     borderRadius: 10,
     padding: 12,
     height: 100,
@@ -235,11 +536,9 @@ const styles = StyleSheet.create({
   translated: {
     marginTop: 8,
     fontStyle: 'italic',
-    color: '#555',
   },
 
   playBtn: {
-    backgroundColor: '#2F5DFF',
     padding: 16,
     borderRadius: 50,
     alignSelf: 'center',
@@ -249,14 +548,10 @@ const styles = StyleSheet.create({
   voiceItem: {
     padding: 10,
     borderBottomWidth: 1,
-    borderColor: '#EEE',
+    borderRadius: 8,
   },
 
-  voiceActive: {
-    backgroundColor: '#DCE4FF',
-  },
+  voiceText: {},
 
-  voiceText: {
-    fontSize: 13,
-  },
+  voiceActive: {},
 });

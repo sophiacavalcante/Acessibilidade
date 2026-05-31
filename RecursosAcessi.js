@@ -1,4 +1,5 @@
 import React from "react";
+
 import {
   Text,
   View,
@@ -17,154 +18,478 @@ import {
   ChevronRight,
 } from "lucide-react-native";
 
-export default function Recursos({ navigation, route }) {
-  const [menuAberto, setMenuAberto] = React.useState(false);
+import { useConfig } from "./Config";
 
-  const nomeUsuario = route?.params?.nome || "Usuário";
+export default function Recursos({
+  navigation,
+  route,
+}) {
+  const [menuAberto, setMenuAberto] =
+    React.useState(false);
+
+  const nomeUsuario =
+    route?.params?.nome || "Usuário";
+
+  // CONFIGURAÇÕES GLOBAIS
+
+  const {
+    fontSize,
+    altoContraste,
+    modoDaltonico,
+  } = useConfig();
+
+  // CORES PADRÃO
+
+  let bg = "#F8FAFC";
+
+  let textColor = "#111827";
+
+  let secondaryText = "#6B7280";
+
+  let primary = "#2F5DFF";
+
+  let cardBg = "#FFFFFF";
+
+  let menuBg = "#FFFFFF";
+
+  let heroBg = "#2F5DFF";
+
+  // ALTO CONTRASTE
+
+  // ALTO CONTRASTE (PRETO E AZUL)
+
+  if (altoContraste) {
+    bg = '#000000';
+
+    textColor = '#FFFFFF';
+
+    secondaryText = '#DDDDDD';
+
+    primary = '#0A84FF';
+
+    cardBg = '#111111';
+
+    menuBg = '#111111';
+
+    heroBg = '#0A84FF';
+  }
+
+  // MODO DALTÔNICO (PRETO E BRANCO)
+
+  if (modoDaltonico) {
+    bg = "#FFFFFF";
+
+    textColor = "#000000";
+
+    secondaryText = "#333333";
+
+    primary = "#000000";
+
+    cardBg = "#F2F2F2";
+
+    menuBg = "#F2F2F2";
+
+    heroBg = "#000000";
+  }
 
   const recursos = [
     {
       titulo: "Leitor de Texto",
       descricao: "Converta texto em áudio",
-      icon: <Eye size={26} color="#4F46E5" />,
+      icon: (
+        <Eye
+          size={26}
+          color={primary}
+        />
+      ),
       tela: "LeitorTexto",
-      bg: "#EEF2FF",
+      bg: modoDaltonico
+        ? "#E5E5E5"
+        : "#EEF2FF",
     },
+
     {
-      titulo: "Reconhecimento de Voz",
+      titulo:
+        "Reconhecimento de Voz",
+
       descricao: "Controle por voz",
-      icon: <Ear size={26} color="#2563EB" />,
+
+      icon: (
+        <Ear
+          size={26}
+          color={primary}
+        />
+      ),
+
       tela: "ReconhecimentoVoz",
-      bg: "#EFF6FF",
+
+      bg: modoDaltonico
+        ? "#E5E5E5"
+        : "#EFF6FF",
     },
+
     {
       titulo: "Locais",
-      descricao: "Locais acessíveis",
-      icon: <MapPin size={26} color="#F59E0B" />,
+
+      descricao:
+        "Locais acessíveis",
+
+      icon: (
+        <MapPin
+          size={26}
+          color={primary}
+        />
+      ),
+
       tela: "Locais",
-      bg: "#FFFBEB",
+
+      bg: modoDaltonico
+        ? "#E5E5E5"
+        : "#FFFBEB",
     },
+
     {
       titulo: "Suporte",
-      descricao: "Atendimento acessível",
-      icon: <Headphones size={26} color="#7C3AED" />,
+
+      descricao:
+        "Atendimento acessível",
+
+      icon: (
+        <Headphones
+          size={26}
+          color={primary}
+        />
+      ),
+
       tela: "Suporte",
-      bg: "#F5F3FF",
+
+      bg: modoDaltonico
+        ? "#E5E5E5"
+        : "#F5F3FF",
     },
   ];
 
   return (
-    <View style={styles.wrapper}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
+    <View
+      style={[
+        styles.wrapper,
+        {
+          backgroundColor: bg,
+        },
+      ]}
+    >
+      <StatusBar
+        barStyle={
+          altoContraste
+            ? "light-content"
+            : "dark-content"
+        }
+        backgroundColor={bg}
+      />
 
       <ScrollView
         style={styles.container}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
+        contentContainerStyle={
+          styles.content
+        }
+        showsVerticalScrollIndicator={
+          false
+        }
       >
         {/* HEADER */}
+
         <View style={styles.header}>
           <View style={styles.profileLeft}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {nomeUsuario.charAt(0).toUpperCase()}
+            <View
+              style={[
+                styles.avatar,
+                {
+                  backgroundColor:
+                    primary,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.avatarText,
+                  {
+                    fontSize:
+                      fontSize + 6,
+                  },
+                ]}
+              >
+                {nomeUsuario
+                  .charAt(0)
+                  .toUpperCase()}
               </Text>
             </View>
 
             <View>
-              <Text style={styles.welcome}>Bem-vindo 👋</Text>
-              <Text style={styles.nome}>{nomeUsuario}</Text>
+              <Text
+                style={[
+                  styles.welcome,
+                  {
+                    color:
+                      secondaryText,
+
+                    fontSize:
+                      fontSize - 3,
+                  },
+                ]}
+              >
+                Bem-vindo 👋
+              </Text>
+
+              <Text
+                style={[
+                  styles.nome,
+                  {
+                    color: textColor,
+
+                    fontSize:
+                      fontSize + 4,
+                  },
+                ]}
+              >
+                {nomeUsuario}
+              </Text>
             </View>
           </View>
 
+          {/* BOTÃO MENU */}
+
           <TouchableOpacity
-            style={styles.menuButton}
-            onPress={() => setMenuAberto(true)}
+            style={[
+              styles.menuButton,
+              {
+                backgroundColor:
+                  cardBg,
+              },
+            ]}
+            onPress={() =>
+              setMenuAberto(true)
+            }
             activeOpacity={0.8}
           >
-            <Menu size={24} color="#111827" />
+            <Menu
+              size={24}
+              color={textColor}
+            />
           </TouchableOpacity>
         </View>
 
-        {/* HERO CARD */}
-        <View style={styles.hero}>
-          <Text style={styles.heroTitle}>
-            Recursos de Acessibilidade
+        {/* HERO */}
+
+        <View
+          style={[
+            styles.hero,
+            {
+              backgroundColor:
+                heroBg,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.heroTitle,
+              {
+                fontSize:
+                  fontSize + 8,
+              },
+            ]}
+          >
+            Recursos de
+            Acessibilidade
           </Text>
 
-          <Text style={styles.heroText}>
-            Ferramentas desenvolvidas para melhorar sua experiência no app.
+          <Text
+            style={[
+              styles.heroText,
+              {
+                fontSize:
+                  fontSize - 1,
+              },
+            ]}
+          >
+            Ferramentas
+            desenvolvidas para
+            melhorar sua experiência
+            no aplicativo.
           </Text>
         </View>
 
-        {/* GRID */}
+        {/* CARDS */}
+
         <View style={styles.grid}>
-          {recursos.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.card}
-              activeOpacity={0.88}
-              onPress={() => navigation.navigate(item.tela)}
-            >
-              {/* ÍCONE */}
-              <View
+          {recursos.map(
+            (item, index) => (
+              <TouchableOpacity
+                key={index}
                 style={[
-                  styles.iconContainer,
-                  { backgroundColor: item.bg },
+                  styles.card,
+                  {
+                    backgroundColor:
+                      cardBg,
+                  },
                 ]}
+                activeOpacity={0.88}
+                onPress={() =>
+                  navigation.navigate(
+                    item.tela
+                  )
+                }
               >
-                {item.icon}
-              </View>
+                <View
+                  style={[
+                    styles.iconContainer,
+                    {
+                      backgroundColor:
+                        item.bg,
+                    },
+                  ]}
+                >
+                  {item.icon}
+                </View>
 
-              {/* TEXTO */}
-              <Text style={styles.cardTitle}>
-                {item.titulo}
-              </Text>
+                <Text
+                  style={[
+                    styles.cardTitle,
+                    {
+                      color: textColor,
 
-              <Text style={styles.cardText}>
-                {item.descricao}
-              </Text>
-
-              {/* FOOTER */}
-              <View style={styles.cardFooter}>
-                <Text style={styles.cardAction}>
-                  Abrir
+                      fontSize:
+                        fontSize + 1,
+                    },
+                  ]}
+                >
+                  {item.titulo}
                 </Text>
 
-                <ChevronRight size={18} color="#9CA3AF" />
-              </View>
-            </TouchableOpacity>
-          ))}
+                <Text
+                  style={[
+                    styles.cardText,
+                    {
+                      color:
+                        secondaryText,
+
+                      fontSize:
+                        fontSize - 2,
+                    },
+                  ]}
+                >
+                  {item.descricao}
+                </Text>
+
+                <View
+                  style={
+                    styles.cardFooter
+                  }
+                >
+                  <Text
+                    style={[
+                      styles.cardAction,
+                      {
+                        color: primary,
+
+                        fontSize:
+                          fontSize - 2,
+                      },
+                    ]}
+                  >
+                    Abrir
+                  </Text>
+
+                  <ChevronRight
+                    size={18}
+                    color={primary}
+                  />
+                </View>
+              </TouchableOpacity>
+            )
+          )}
         </View>
       </ScrollView>
 
       {/* MENU LATERAL */}
+
       {menuAberto && (
         <View style={styles.overlay}>
           <TouchableOpacity
-            style={styles.overlayBackground}
-            onPress={() => setMenuAberto(false)}
+            style={
+              styles.overlayBackground
+            }
+            onPress={() =>
+              setMenuAberto(false)
+            }
           />
 
-          <View style={styles.menu}>
-            <Text style={styles.menuTitle}>
+          <View
+            style={[
+              styles.menu,
+              {
+                backgroundColor:
+                  menuBg,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.menuTitle,
+                {
+                  color: textColor,
+
+                  fontSize:
+                    fontSize + 8,
+                },
+              ]}
+            >
               Menu
             </Text>
 
             <TouchableOpacity
-              style={styles.menuItemBox}
-              onPress={() => navigation.navigate("Config")}
+              style={
+                styles.menuItemBox
+              }
+              onPress={() =>
+                navigation.navigate(
+                  "Config"
+                )
+              }
             >
-              <Text style={styles.menuItem}>
+              <Text
+                style={[
+                  styles.menuItem,
+                  {
+                    color: textColor,
+
+                    fontSize:
+                      fontSize,
+                  },
+                ]}
+              >
                 ⚙️ Configurações
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.menuItemBox}
-              onPress={() => setMenuAberto(false)}
+              style={
+                styles.menuItemBox
+              }
+              onPress={() =>
+                setMenuAberto(false)
+              }
             >
-              <Text style={styles.menuItem}>
+              <Text
+                style={[
+                  styles.menuItem,
+                  {
+                    color: textColor,
+
+                    fontSize:
+                      fontSize,
+                  },
+                ]}
+              >
                 ❌ Fechar
               </Text>
             </TouchableOpacity>
@@ -178,7 +503,6 @@ export default function Recursos({ navigation, route }) {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: "#F8FAFC",
   },
 
   container: {
@@ -191,121 +515,144 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
 
-  /* HEADER */
+  // HEADER
 
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
+
+    justifyContent:
+      "space-between",
+
     alignItems: "center",
+
     marginBottom: 28,
   },
 
   profileLeft: {
     flexDirection: "row",
+
     alignItems: "center",
   },
 
   avatar: {
     width: 58,
     height: 58,
+
     borderRadius: 29,
-    backgroundColor: "#2F5DFF",
+
     justifyContent: "center",
+
     alignItems: "center",
+
     marginRight: 14,
 
-    shadowColor: "#2F5DFF",
+    shadowColor: "#000",
+
     shadowOffset: {
       width: 0,
-      height: 5,
+      height: 4,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
+
+    shadowOpacity: 0.15,
+
+    shadowRadius: 8,
 
     elevation: 5,
   },
 
   avatarText: {
     color: "#FFF",
-    fontSize: 22,
+
     fontWeight: "700",
   },
 
   welcome: {
-    fontSize: 13,
-    color: "#6B7280",
     marginBottom: 2,
   },
 
   nome: {
-    fontSize: 20,
     fontWeight: "700",
-    color: "#111827",
   },
 
   menuButton: {
     width: 48,
     height: 48,
+
     borderRadius: 14,
-    backgroundColor: "#FFF",
+
     justifyContent: "center",
+
     alignItems: "center",
 
     shadowColor: "#000",
+
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.05,
+
+    shadowOpacity: 0.06,
+
     shadowRadius: 8,
 
-    elevation: 3,
+    elevation: 4,
   },
 
-  /* HERO */
+  // HERO
 
   hero: {
-    backgroundColor: "#2F5DFF",
     borderRadius: 28,
+
     padding: 24,
+
     marginBottom: 28,
   },
 
   heroTitle: {
-    fontSize: 24,
     fontWeight: "700",
+
     color: "#FFF",
+
     marginBottom: 10,
   },
 
   heroText: {
-    fontSize: 14,
     lineHeight: 22,
-    color: "rgba(255,255,255,0.85)",
+
+    color:
+      "rgba(255,255,255,0.88)",
   },
 
-  /* GRID */
+  // GRID
 
   grid: {
     flexDirection: "row",
+
     flexWrap: "wrap",
-    justifyContent: "space-between",
+
+    justifyContent:
+      "space-between",
   },
 
   card: {
     width: "47%",
-    backgroundColor: "#FFF",
+
     borderRadius: 24,
+
     padding: 18,
+
     marginBottom: 18,
 
     shadowColor: "#000",
+
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 3,
     },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
+
+    shadowOpacity: 0.08,
+
+    shadowRadius: 8,
 
     elevation: 4,
   },
@@ -313,89 +660,104 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 56,
     height: 56,
+
     borderRadius: 18,
+
     justifyContent: "center",
+
     alignItems: "center",
+
     marginBottom: 18,
   },
 
   cardTitle: {
-    fontSize: 16,
     fontWeight: "700",
-    color: "#111827",
+
     marginBottom: 8,
+
     lineHeight: 22,
   },
 
   cardText: {
-    fontSize: 13,
-    color: "#6B7280",
     lineHeight: 20,
+
     minHeight: 40,
   },
 
   cardFooter: {
     marginTop: 18,
+
     flexDirection: "row",
+
     alignItems: "center",
-    justifyContent: "space-between",
+
+    justifyContent:
+      "space-between",
   },
 
   cardAction: {
-    color: "#2F5DFF",
     fontWeight: "600",
-    fontSize: 13,
   },
 
-  /* MENU */
+  // MENU
 
   overlay: {
     position: "absolute",
+
     width: "100%",
+
     height: "100%",
+
     flexDirection: "row",
   },
 
   overlayBackground: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.35)",
+
+    backgroundColor:
+      "rgba(0,0,0,0.35)",
   },
 
   menu: {
     width: 250,
-    backgroundColor: "#FFF",
+
     paddingTop: 60,
+
     paddingHorizontal: 20,
 
     shadowColor: "#000",
+
     shadowOffset: {
       width: -2,
       height: 0,
     },
+
     shadowOpacity: 0.1,
+
     shadowRadius: 12,
 
     elevation: 10,
   },
 
   menuTitle: {
-    fontSize: 24,
     fontWeight: "700",
-    color: "#111827",
+
     marginBottom: 25,
   },
 
   menuItemBox: {
     backgroundColor: "#F3F4F6",
+
     paddingVertical: 14,
+
     paddingHorizontal: 14,
+
     borderRadius: 14,
+
     marginBottom: 14,
   },
 
   menuItem: {
-    fontSize: 15,
-    color: "#374151",
     fontWeight: "500",
   },
 });

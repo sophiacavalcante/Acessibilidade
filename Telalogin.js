@@ -8,38 +8,40 @@ import {
   Image,
   Alert
 } from "react-native";
-
 import { Mail, Lock } from 'lucide-react-native';
 
 export default function Login({ navigation, route }) {
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // 🔥 nome vindo do cadastro
   const nome = route?.params?.nome || "Usuário";
+
+  const validarEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
 
   const enviarMensagem = async () => {
     if (!email.trim() || !password.trim()) {
-      alert("Preencha todos os campos corretamente.");
+      Alert.alert("Atenção", "Preencha todos os campos.");
+      return;
+    }
+
+    if (!validarEmail(email)) {
+      Alert.alert("E-mail inválido", "Digite um e-mail no formato correto. Ex: nome@email.com");
       return;
     }
 
     setLoading(true);
 
     try {
-
-      // ⚠️ Aqui você não precisa salvar login de novo no Firebase
-      // (mantive seu fluxo, mas o ideal é Firebase Auth)
-
       Alert.alert("Sucesso", "Login realizado!");
 
       setEmail('');
       setPassword('');
 
-      // ✅ CORRETO: passa o nome para Recursos
       navigation.navigate("Recursos", { nome });
 
     } catch (error) {
@@ -53,7 +55,6 @@ export default function Login({ navigation, route }) {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-
         <Image
           source={{ uri: 'https://cdn-icons-png.flaticon.com/512/10629/10629340.png' }}
           style={styles.image}
@@ -62,7 +63,6 @@ export default function Login({ navigation, route }) {
         <Text style={styles.welcome}>Bem-vindo ao</Text>
         <Text style={styles.title}>Acessi+</Text>
 
-        {/* Email */}
         <View style={styles.inputContainer}>
           <Mail color="#0056b3" size={20} />
           <TextInput
@@ -71,13 +71,13 @@ export default function Login({ navigation, route }) {
             placeholderTextColor="#999"
             value={email}
             onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
         </View>
 
-        {/* Senha */}
         <View style={styles.inputContainer}>
           <Lock color="#0056b3" size={20} />
-
           <TextInput
             style={styles.input}
             placeholder="Senha"
@@ -86,7 +86,6 @@ export default function Login({ navigation, route }) {
             value={password}
             onChangeText={setPassword}
           />
-
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Text style={styles.showText}>
               {showPassword ? "Ocultar" : "Exibir"}
@@ -94,7 +93,6 @@ export default function Login({ navigation, route }) {
           </TouchableOpacity>
         </View>
 
-        {/* Botão */}
         <TouchableOpacity
           onPress={enviarMensagem}
           style={[styles.primaryButton, loading && { opacity: 0.7 }]}
@@ -110,7 +108,6 @@ export default function Login({ navigation, route }) {
             Esqueci minha senha
           </Text>
         </TouchableOpacity>
-
       </View>
     </View>
   );
@@ -121,32 +118,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F8F9FB",
   },
-
   content: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
   },
-
   image: {
     width: 180,
     height: 146,
     marginBottom: 20,
   },
-
   welcome: {
     fontSize: 16,
     color: "#666",
   },
-
   title: {
     fontSize: 28,
     fontWeight: "bold",
     color: "#2F5DFF",
     marginBottom: 10,
   },
-
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -159,19 +151,16 @@ const styles = StyleSheet.create({
     borderColor: '#D0E3FF',
     width: "100%",
   },
-
   input: {
     flex: 1,
     marginLeft: 10,
     color: '#333',
     fontSize: 16,
   },
-
   showText: {
     color: "#2F5DFF",
     fontWeight: "bold",
   },
-
   primaryButton: {
     width: "100%",
     height: 50,
@@ -181,13 +170,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 10,
   },
-  
   primaryText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
-
   forgotPassword: {
     marginTop: 15,
     color: "#2F5DFF",
